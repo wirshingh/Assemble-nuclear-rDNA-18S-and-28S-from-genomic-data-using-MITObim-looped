@@ -37,15 +37,16 @@ module load bioinformatics/bbmap
 #
 echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
 #
-# Create directory where interleaved sequences will be placed
-mkdir -p interleaved_sequences
 
 # Create variable by copying full path to trimmed sequences
-SAMPLEDIR_TRM="full path to trimmed sequences"
+SAMPLEDIR_TRM="path to trimmed reads"
 
 # Create variable by copying full path to the base directory.
-# This is where the job file is located and where the output directory will be created.
-SAMPLEDIR_BASE="full path to base directory"
+# This is where the results will be.
+SAMPLEDIR_BASE="path to base directory"
+
+# In the base directory create a directory where the interleaved sequences will be placed
+mkdir -p ${SAMPLEDIR_BASE}/interleaved_sequences
 
 # Use loop to generate a sample names for each sample and run BBmap 
 for GETSAMPLENAME in ${SAMPLEDIR_TRM}/*_R1_PE_trimmed.fastq.gz
@@ -60,7 +61,6 @@ done
 
 #
 echo = `date` job $JOB_NAME done
-
 
 ```
 
