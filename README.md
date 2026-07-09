@@ -75,7 +75,11 @@ Create a fasta file (.fasta) with the seed used for assembling the gene of inter
 
 SAMPLEDIR_INT=
 
-Paste full path to the directory that contains the interleaved sequences after the "=".
+Paste full path to the directory that contains the interleaved sequences.
+
+SAMPLEDIR_BASE=
+
+Paste full path the project's base directory. This is where the results will go.
 
 -ref name_of_project 
 
