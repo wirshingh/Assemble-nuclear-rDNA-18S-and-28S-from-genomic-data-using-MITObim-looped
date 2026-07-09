@@ -42,7 +42,7 @@ echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
 SAMPLEDIR_TRM="path to trimmed reads"
 
 # Create variable by copying full path to the base directory.
-# This is where the results will be.
+# This is where the results will go.
 SAMPLEDIR_BASE="path to base directory"
 
 # In the base directory create a directory where the interleaved sequences will be placed
