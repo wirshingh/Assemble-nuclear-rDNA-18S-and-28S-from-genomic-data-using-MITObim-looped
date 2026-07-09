@@ -116,47 +116,55 @@ source activate mitobim
 echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
 echo + NSLOTS = $NSLOTS
 #
-mkdir -p mitobim_results
 
 # Create variable by pasting full path to directory with interleaved sequences
-SAMPLEDIR_INT="path to interleaved sequences"
+SAMPLEDIR_INT="full path to interleaved sequences"
+
+# Create variable to the base directory where results will go.
+SAMPLEDIR_BASE="full path to base directory"
+
+# Create directory where results results will be copied
+mkdir -p ${SAMPLEDIR_BASE}/mitobim_results
 
 # Use loop to generate sample names for each sample  
 for GETSAMPLENAME in ${SAMPLEDIR_INT}/*_interleaved.fastq.gz
 do
 SAMPLENAME=$(basename "$GETSAMPLENAME" _interleaved.fastq.gz)
 
-# Create sample-specific directories and move them to mitobim_results directory
-mkdir "${SAMPLENAME}_mitobim"
-mv ./"${SAMPLENAME}_mitobim" ./mitobim_results
-cd ./mitobim_results/"${SAMPLENAME}_mitobim" || exit
+# Create sample-specific directories in the mitobim_results directory
+mkdir -p "${SAMPLEDIR_BASE}/mitobim_results/${SAMPLENAME}_mitobim"
+cd "${SAMPLEDIR_BASE}/mitobim_results/${SAMPLENAME}_mitobim" || exit
 
 # Run mitobim from sample-specific directories in a loop
 MITObim.pl \
 -sample "${SAMPLENAME}" \
--ref name_of_project \
+-ref testjob \
 --readpool "${SAMPLEDIR_INT}"/${SAMPLENAME}_interleaved.fastq.gz \
---quick "full path to to fasta file with seed" \
+--quick "full path to seed file in .fasta format" \
 --end 4 --pair --clean &> "log_${SAMPLENAME}"
-cd ../..
+cd "${SAMPLEDIR_BASE}"
+
 done
 
 # Rename output files
 # Creates a directory named mitobim_final_renamed_contigs_and_logs
-mkdir -p mitobim_final_renamed_contigs_and_logs 
+mkdir -p ${SAMPLEDIR_BASE}/mitobim_final_renamed_contigs_and_logs 
 
 # Iterates over files/directories from mitobim outputs in the current directory
-for mitobim_rename in ./mitobim_*/*_mitobim; do
+for mitobim_rename in ${SAMPLEDIR_BASE}/mitobim_results/*_mitobim
+do
+SAMPLENAME=$(basename "$mitobim_rename")
+   
     # Prints the name of each file/directory being processed
-    echo "Processing file: $mitobim_rename"
+    echo "Processing file: $SAMPLENAME"
 
     # Copies files matching the pattern to the mitobim_final_renamed_contigs_and_logs directory
-    cp ./${mitobim_rename}/iteration*/*_noIUPAC.fasta ./mitobim_final_renamed_contigs_and_logs
-    cp ./${mitobim_rename}/log_* ./mitobim_final_renamed_contigs_and_logs
+    cp ${SAMPLEDIR_BASE}/mitobim_results/${SAMPLENAME}/iteration*/*_noIUPAC.fasta ${SAMPLEDIR_BASE}/mitobim_final_renamed_contigs_and_logs
+    cp ${SAMPLEDIR_BASE}/mitobim_results/${SAMPLENAME}/log_* ${SAMPLEDIR_BASE}/mitobim_final_renamed_contigs_and_logs
 done
 
 # Iterate over files in the directory
-for mitobim_internalrename in ./mitobim_final_renamed_contigs_and_logs/*_noIUPAC.fasta; do
+for mitobim_internalrename in ${SAMPLEDIR_BASE}/mitobim_final_renamed_contigs_and_logs/*_noIUPAC.fasta; do
     # Extract filename without extension
     filename=$(basename "$mitobim_internalrename" _noIUPAC.fasta)
 
@@ -170,6 +178,8 @@ echo "Done"
 
 #
 echo = `date` job $JOB_NAME done
+
+
 
 
 ```
